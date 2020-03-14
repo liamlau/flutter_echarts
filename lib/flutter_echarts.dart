@@ -46,6 +46,8 @@ class _EchartsState extends State<Echarts> {
 
   String _currentOption;
 
+  bool isInitialLoaded = false;
+
   @override
   void initState() {
     super.initState();
@@ -88,13 +90,20 @@ class _EchartsState extends State<Echarts> {
 
   @override
   Widget build(BuildContext context) {
-    return WebView(
+
+    return AnimatedOpacity(
+      opacity: isInitialLoaded ? 1 : 0,
+      duration: Duration(milliseconds: 500),
+      child: WebView(
       initialUrl: htmlBase64,
       javascriptMode: JavascriptMode.unrestricted,
       onWebViewCreated: (WebViewController webViewController) {
         _controller = webViewController;
       },
       onPageFinished: (String url) {
+        if (!isInitialLoaded) {
+          setState(() => isInitialLoaded = true);
+        }
         init();
       },
       javascriptChannels: <JavascriptChannel>[
@@ -124,6 +133,6 @@ class _EchartsState extends State<Echarts> {
               ..onEnd = (DragEndDetails details) {};
           })))
         : null,
-    );
+      ));
   }
 }
